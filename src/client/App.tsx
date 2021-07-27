@@ -11,7 +11,7 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import Badge from '@material-ui/core/Badge';
 // Styles
 import { Wrapper, StyledButton, StyledAppBar, HeaderTypography } from './App.styles';
-import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import {AppBar, Dialog, Toolbar, Typography} from '@material-ui/core';
 // Types
 export type CartItemType = {
   id: number;
@@ -23,13 +23,21 @@ export type CartItemType = {
   amount: number;
 };
 
-
 const getCheeses = async (): Promise<CartItemType[]> =>
   await (await fetch(`api/cheeses`)).json();
 
 const App = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([] as CartItemType[]);
+
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [itemTitle, setItemTitle] = useState("");
+  const [itemDescription, setItemDescription] = useState("");
+  const [itemImage, setItemImage] = useState("");
+  const [itemPrice, setItemPrice] = useState(0);
+  const [itemCategory, setItemCategory] = useState("");
+
   const { data, isLoading, error } = useQuery<CartItemType[]>(
     'cheeses',
     getCheeses
@@ -38,6 +46,17 @@ const App = () => {
 
   const getTotalItems = (items: CartItemType[]) =>
     items.reduce((ack: number, item) => ack + item.amount, 0);
+
+  const handleItemDetails = (clickedItem: CartItemType) => {
+
+    setOpenDialog(true);
+    setItemTitle(clickedItem.title);
+    setItemDescription(clickedItem.description);
+    setItemCategory(clickedItem.category);
+    setItemPrice(clickedItem.price);
+    setItemImage(clickedItem.image);
+
+  }
 
   const handleAddToCart = (clickedItem: CartItemType) => {
     setCartItems(prev => {
@@ -122,10 +141,20 @@ const App = () => {
       <Grid container spacing={3}>
         {data?.map(item => (
           <Grid item key={item.id} xs={12} sm={4}>
-            <Item item={item} handleAddToCart={handleAddToCart} />
+            <Item item={item} handleAddToCart={handleAddToCart} handleItemDetails={handleItemDetails}/>
           </Grid>
         ))}
       </Grid>
+
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(!openDialog)}>
+        <img src={itemImage} alt={itemTitle}/>
+        <h3>{itemTitle}</h3>
+        <h3>{itemCategory}</h3>
+        <h3>{itemDescription}</h3>
+        <h3>{itemPrice}</h3>
+      </Dialog>
+
     </Wrapper>
 
   );
