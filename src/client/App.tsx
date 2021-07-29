@@ -11,7 +11,8 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import Badge from '@material-ui/core/Badge';
 // Styles
 import { Wrapper, StyledButton, StyledAppBar, HeaderTypography } from './App.styles';
-import {AppBar, Dialog, Toolbar, Typography} from '@material-ui/core';
+import {Dialog, Toolbar, Typography} from '@material-ui/core';
+import RecentPurchase from "./Cart/RecentPurchase";
 // Types
 export type CartItemType = {
   id: number;
@@ -23,12 +24,34 @@ export type CartItemType = {
   amount: number;
 };
 
+export type PurchaseHistory = {
+  id: number;
+  category: string;
+  description: string;
+  image: string;
+  price: number;
+  title: string;
+  amount: number;
+}
+
 const getCheeses = async (): Promise<CartItemType[]> =>
   await (await fetch(`api/cheeses`)).json();
+
+const postPurchase = async (data): Promise<CartItemType[]> =>
+    await (await fetch(`api/purchase`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })).json();
+
+
 
 const App = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([] as CartItemType[]);
+  const [recentPurchasesOpen, setRecentPurchasesOpen] = useState(false);
 
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -48,14 +71,12 @@ const App = () => {
     items.reduce((ack: number, item) => ack + item.amount, 0);
 
   const handleItemDetails = (clickedItem: CartItemType) => {
-
     setOpenDialog(true);
     setItemTitle(clickedItem.title);
     setItemDescription(clickedItem.description);
     setItemCategory(clickedItem.category);
     setItemPrice(clickedItem.price);
     setItemImage(clickedItem.image);
-
   }
 
   const handleAddToCart = (clickedItem: CartItemType) => {
@@ -88,6 +109,12 @@ const App = () => {
     );
   };
 
+  const completePurchase = (cartItems) => {
+    postPurchase(cartItems);
+    setCartItems([]);
+    setCartOpen(false);
+  }
+
   if (isLoading) return <LinearProgress />;
   if (error) return <div>Something went wrong ...</div>;
 
@@ -102,7 +129,8 @@ const App = () => {
             justify="space-between"
             alignItems="center"
           >
-            <StyledButton>
+            <StyledButton onClick={() => setRecentPurchasesOpen(true)}
+                          data-cy="recent-purchases">
               <RestoreIcon />
               <Typography variant="subtitle2">
                 Recent Purchases
@@ -135,7 +163,12 @@ const App = () => {
           cartItems={cartItems}
           addToCart={handleAddToCart}
           removeFromCart={handleRemoveFromCart}
+          completePurchase={completePurchase}
         />
+      </Drawer>
+
+      <Drawer anchor='left' open={recentPurchasesOpen} onClose={() => setRecentPurchasesOpen(false)}>
+        <RecentPurchase/>
       </Drawer>
 
       <Grid container spacing={3}>
@@ -146,7 +179,6 @@ const App = () => {
         ))}
       </Grid>
 
-
       <Dialog open={openDialog} onClose={() => setOpenDialog(!openDialog)}>
         <img src={itemImage} alt={itemTitle}/>
         <h3>{itemTitle}</h3>
@@ -154,7 +186,6 @@ const App = () => {
         <h3>{itemDescription}</h3>
         <h3>{itemPrice}</h3>
       </Dialog>
-
     </Wrapper>
 
   );
