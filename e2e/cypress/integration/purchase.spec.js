@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-context('Cart Actions', () => {
+context('Purchase and Review', () => {
   beforeEach(() => {
     cy.visit('/');
   })

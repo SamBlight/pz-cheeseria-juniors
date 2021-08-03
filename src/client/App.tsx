@@ -37,13 +37,13 @@ export type PurchaseHistory = {
 const getCheeses = async (): Promise<CartItemType[]> =>
   await (await fetch(`api/cheeses`)).json();
 
-const postPurchase = async (data): Promise<CartItemType[]> =>
+const postPurchase = async (purchaseOrders: any[]): Promise<CartItemType[]> =>
     await (await fetch(`api/purchase`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(purchaseOrders)
     })).json();
 
 
@@ -109,10 +109,10 @@ const App = () => {
     );
   };
 
-  const completePurchase = (cartItems) => {
-    postPurchase(cartItems);
-    setCartItems([]);
-    setCartOpen(false);
+  const completePurchase = (cartItems:  CartItemType[]) => {
+    postPurchase(cartItems)
+      setCartItems([]);
+      setCartOpen(false);
   }
 
   if (isLoading) return <LinearProgress />;

@@ -12,14 +12,6 @@ export const Wrapper = styled.div`
   button {
     border-radius: 0 0 20px 20px;
   }
-  
-  card {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-  }
 
   img {
     max-height: 250px;

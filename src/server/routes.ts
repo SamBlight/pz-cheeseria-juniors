@@ -8,7 +8,8 @@ router.get('/api/cheeses', (req, res, next) => {
   res.json(cheeses);
 });
 
-const purchaseOrder = [];
+let purchaseOrder: any[];
+purchaseOrder = [];
 
 router.post('/api/purchase', (req, res, next) => {
 

@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import { CartItemType } from '../../App';
 // Styles
 import { Wrapper } from './CartItem.styles';
+import * as React from "react";
 
 type Props = {
   item: CartItemType;
